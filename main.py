@@ -1,8 +1,6 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
 import plotly.express as px
 import plotly.graph_objects as go
 from PIL import Image
@@ -19,37 +17,416 @@ st.set_page_config(
 # Custom CSS for styling
 st.markdown("""
 <style>
+    /* Modern Color Scheme */
+    :root {
+        --primary-color: #667eea;
+        --secondary-color: #764ba2;
+        --accent-color: #f093fb;
+        --success-color: #4facfe;
+        --warning-color: #43e97b;
+        --danger-color: #fa709a;
+        --dark-color: #2c3e50;
+        --light-color: #ecf0f1;
+    }
+    
+    /* Main Header with Gradient */
     .main-header {
-        font-size: 2.5rem;
-        color: #1E88E5;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-size: 3rem;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 2rem;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    /* Sub Headers with Modern Design */
+    .sub-header {
+        background: linear-gradient(90deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-size: 2rem;
+        font-weight: 600;
+        margin-top: 2rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 3px solid #667eea;
+        padding-bottom: 0.5rem;
+        position: relative;
+    }
+    
+    .sub-header::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 50px;
+        height: 3px;
+        background: linear-gradient(90deg, #f093fb, #fa709a);
+        border-radius: 2px;
+    }
+    
+    /* Metric Cards with Glass Effect */
+    .metric-card {
+        background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 8px 32px rgba(31,38,135,0.37);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .metric-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 40px rgba(31,38,135,0.5);
+    }
+    
+    /* Insight Cards with Gradient Borders */
+    .insight-text {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        color: white;
+        box-shadow: 0 8px 25px rgba(102,126,234,0.3);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .insight-text::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #f093fb, #fa709a);
+    }
+    
+    .insight-text h3 {
+        color: #ffffff;
+        margin-bottom: 1rem;
+        font-weight: 600;
+    }
+    
+    .insight-text p {
+        color: #f8f9fa;
+        line-height: 1.6;
+    }
+    
+    /* Recommendation Cards with Success Theme */
+    .recommendation-card {
+        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        color: #2c3e50;
+        box-shadow: 0 8px 25px rgba(67,233,123,0.3);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .recommendation-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #fa709a, #fee140);
+    }
+    
+    .recommendation-card h3, .recommendation-card h4 {
+        color: #2c3e50;
+        margin-bottom: 1rem;
+        font-weight: 600;
+    }
+    
+    .recommendation-card ul {
+        color: #34495e;
+        line-height: 1.8;
+    }
+    
+    /* Warning Cards */
+    .warning-card {
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        color: #2c3e50;
+        box-shadow: 0 8px 25px rgba(250,112,154,0.3);
+    }
+    
+    /* Success Cards */
+    .success-card {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        color: white;
+        box-shadow: 0 8px 25px rgba(79,172,254,0.3);
+    }
+    
+    /* Sidebar Styling */
+    .css-1d391kg {
+        background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    /* Button Styling */
+    .stButton > button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 10px;
+        color: white;
+        font-weight: 600;
+        padding: 0.5rem 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .stButton > button:hover {
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102,126,234,0.4);
+    }
+    
+    /* Selectbox Styling */
+    .stSelectbox > div > div {
+        border-radius: 10px;
+        border: 2px solid #667eea;
+    }
+    
+    /* Slider Styling */
+    .stSlider > div > div > div > div {
+        background: linear-gradient(90deg, #667eea, #764ba2);
+    }
+    
+    /* Metric Styling */
+    .metric-container {
+        background: linear-gradient(135deg, rgba(102,126,234,0.1) 0%, rgba(118,75,162,0.1) 100%);
+        border-radius: 15px;
+        padding: 1rem;
+        border: 1px solid rgba(102,126,234,0.2);
+    }
+    
+    /* Chart Container Styling */
+    .chart-container {
+        background: rgba(255,255,255,0.05);
+        border-radius: 15px;
+        padding: 1rem;
+        border: 1px solid rgba(102,126,234,0.1);
+        backdrop-filter: blur(5px);
+    }
+    
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+        width: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(135deg, #764ba2, #667eea);
+    }
+    
+    /* Text Gradients */
+    .gradient-text {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: bold;
+    }
+    
+    /* Animated Background */
+    @keyframes gradient {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    
+    .animated-bg {
+        background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #fa709a);
+        background-size: 400% 400%;
+        animation: gradient 15s ease infinite;
+    }
+    
+    /* Enhanced Text Colors */
+    .text-primary {
+        color: #667eea !important;
+        font-weight: 600;
+    }
+    
+    .text-secondary {
+        color: #764ba2 !important;
+        font-weight: 500;
+    }
+    
+    .text-success {
+        color: #43e97b !important;
+        font-weight: 600;
+    }
+    
+    .text-warning {
+        color: #fa709a !important;
+        font-weight: 600;
+    }
+    
+    .text-info {
+        color: #4facfe !important;
+        font-weight: 600;
+    }
+    
+    /* Enhanced Metric Styling */
+    .metric-value {
+        font-size: 2rem;
+        font-weight: bold;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .metric-label {
+        color: #2c3e50;
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+    
+    /* Enhanced Chart Titles */
+    .chart-title {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: bold;
+        font-size: 1.3rem;
         text-align: center;
         margin-bottom: 1rem;
     }
-    .sub-header {
-        font-size: 1.8rem;
-        color: #0D47A1;
-        margin-top: 2rem;
-        margin-bottom: 1rem;
-        border-bottom: 2px solid #E3F2FD;
-        padding-bottom: 0.5rem;
+    
+    /* Enhanced Sidebar */
+    .sidebar .sidebar-content {
+        background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+        color: white;
     }
-    .metric-card {
-        background-color: #F5F5F5;
-        border-radius: 5px;
-        padding: 1rem;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    
+    /* Enhanced Navigation */
+    .nav-link {
+        color: #667eea !important;
+        font-weight: 600;
+        transition: all 0.3s ease;
     }
-    .insight-text {
-        background-color: #E3F2FD;
-        border-left: 5px solid #1E88E5;
-        padding: 1rem;
-        margin-bottom: 1rem;
+    
+    .nav-link:hover {
+        color: #764ba2 !important;
+        transform: translateX(5px);
     }
-    .recommendation-card {
-        background-color: #E8F5E9;
-        border-left: 5px solid #43A047;
+    
+    /* Enhanced Buttons */
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 25px;
+        color: white;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(102,126,234,0.3);
+    }
+    
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102,126,234,0.4);
+    }
+    
+    /* Enhanced Cards */
+    .card-modern {
+        background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        border: 1px solid rgba(102,126,234,0.1);
+        transition: all 0.3s ease;
+    }
+    
+    .card-modern:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+    }
+    
+    /* Enhanced Lists */
+    .list-modern {
+        background: linear-gradient(135deg, rgba(102,126,234,0.05) 0%, rgba(118,75,162,0.05) 100%);
+        border-radius: 15px;
+        padding: 1.5rem;
+        border-left: 4px solid #667eea;
+    }
+    
+    .list-modern li {
+        color: #2c3e50;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        padding-left: 1rem;
+    }
+    
+    /* Enhanced Tables */
+    .table-modern {
+        background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .table-modern th {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        font-weight: 600;
         padding: 1rem;
-        margin-bottom: 1rem;
+    }
+    
+    .table-modern td {
+        padding: 1rem;
+        border-bottom: 1px solid rgba(102,126,234,0.1);
+    }
+    
+    /* Enhanced Alerts */
+    .alert-success {
+        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        color: #2c3e50;
+        border-radius: 15px;
+        padding: 1.5rem;
+        border: none;
+        box-shadow: 0 5px 15px rgba(67,233,123,0.3);
+    }
+    
+    .alert-warning {
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        color: #2c3e50;
+        border-radius: 15px;
+        padding: 1.5rem;
+        border: none;
+        box-shadow: 0 5px 15px rgba(250,112,154,0.3);
+    }
+    
+    .alert-info {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        border: none;
+        box-shadow: 0 5px 15px rgba(79,172,254,0.3);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -128,7 +505,14 @@ def main():
     df = load_data()
     
     # Header
-    st.markdown("<h1 class='main-header'>Telecom Customer Churn Analysis Dashboard</h1>", unsafe_allow_html=True)
+    st.markdown("""
+    <div class="animated-bg" style="padding: 2rem; border-radius: 20px; margin-bottom: 2rem;">
+        <h1 class='main-header'>📊 Telecom Customer Churn Analysis Dashboard</h1>
+        <p style="text-align: center; color: white; font-size: 1.2rem; margin-top: 1rem;">
+            Interactive Analytics & Predictive Insights for Customer Retention
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
     
     # Executive Summary Page
     if page == "Executive Summary":
@@ -156,35 +540,55 @@ def main():
 
 # Executive Summary Page
 def executive_summary(df):
-    st.markdown("<h2 class='sub-header'>Executive Summary</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 class='sub-header'>📈 Executive Summary</h2>", unsafe_allow_html=True)
     
-    # Key metrics
+    # Key metrics with enhanced styling
     col1, col2, col3, col4 = st.columns(4)
     
     with col1:
-        st.metric("Total Customers", f"{len(df):,}")
+        st.markdown("""
+        <div class="metric-card">
+            <div class="metric-value">{:,}</div>
+            <div class="metric-label">Total Customers</div>
+        </div>
+        """.format(len(df)), unsafe_allow_html=True)
     
     with col2:
         churn_rate = df['Churn'].value_counts(normalize=True).loc['Yes'] * 100
-        st.metric("Churn Rate", f"{churn_rate:.2f}%")
+        st.markdown("""
+        <div class="metric-card">
+            <div class="metric-value">{:.2f}%</div>
+            <div class="metric-label">Churn Rate</div>
+        </div>
+        """.format(churn_rate), unsafe_allow_html=True)
     
     with col3:
         avg_tenure = df['tenure'].mean()
-        st.metric("Avg. Tenure (months)", f"{avg_tenure:.1f}")
+        st.markdown("""
+        <div class="metric-card">
+            <div class="metric-value">{:.1f}</div>
+            <div class="metric-label">Avg. Tenure (months)</div>
+        </div>
+        """.format(avg_tenure), unsafe_allow_html=True)
     
     with col4:
         avg_monthly = df['MonthlyCharges'].mean()
-        st.metric("Avg. Monthly Charges", f"${avg_monthly:.2f}")
+        st.markdown("""
+        <div class="metric-card">
+            <div class="metric-value">${:.2f}</div>
+            <div class="metric-label">Avg. Monthly Charges</div>
+        </div>
+        """.format(avg_monthly), unsafe_allow_html=True)
     
     st.markdown("---")
     
-    # Overview text
+    # Overview text with enhanced styling
     st.markdown("""
     <div class='insight-text'>
-    <h3>Overview</h3>
-    <p>This dashboard analyzes customer churn patterns for a telecommunications company. 
-    The overall churn rate is 26.54%, with 1,869 customers having churned out of 7,043 total customers. 
-    The analysis identifies key factors influencing customer decisions to leave the service.</p>
+    <h3>🎯 Overview</h3>
+    <p>This comprehensive dashboard analyzes customer churn patterns for a telecommunications company. 
+    The overall churn rate is <span class="text-warning">26.54%</span>, with <span class="text-warning">1,869 customers</span> having churned out of <span class="text-primary">7,043 total customers</span>. 
+    The analysis identifies key factors influencing customer decisions to leave the service and provides actionable insights for retention strategies.</p>
     </div>
     """, unsafe_allow_html=True)
     
@@ -195,15 +599,20 @@ def executive_summary(df):
         # Churn distribution chart
         churn_counts = df['Churn'].value_counts()
         fig = px.pie(values=churn_counts.values, names=churn_counts.index, 
-                    title="Overall Churn Distribution",
-                    color_discrete_sequence=['#3498db', '#e74c3c'])
+                    title="📊 Overall Churn Distribution",
+                    color_discrete_sequence=['#667eea', '#fa709a'])
         fig.update_traces(textposition='inside', textinfo='percent+label')
+        fig.update_layout(
+            title_font_size=20,
+            title_font_color='#667eea',
+            font=dict(size=14)
+        )
         st.plotly_chart(fig, use_container_width=True)
         
         st.markdown("""
         <div class='insight-text'>
         <p>The chart shows the distribution of customers who have churned versus those who have stayed. 
-        26.54% of customers have left the service, representing a significant portion of the customer base.</p>
+        <span class="text-warning">26.54% of customers</span> have left the service, representing a significant portion of the customer base.</p>
         </div>
         """, unsafe_allow_html=True)
     
@@ -214,14 +623,22 @@ def executive_summary(df):
         contract_churn.columns = ['Contract', 'Churn Rate (%)']
         
         fig = px.bar(contract_churn, x='Contract', y='Churn Rate (%)',
-                    title="Churn by Contract Type",
+                    title="📈 Churn by Contract Type",
                     color='Churn Rate (%)', color_continuous_scale='Reds')
+        fig.update_layout(
+            title_font_size=20,
+            title_font_color='#667eea',
+            font=dict(size=14),
+            xaxis_title="Contract Type",
+            yaxis_title="Churn Rate (%)"
+        )
         st.plotly_chart(fig, use_container_width=True)
         
         st.markdown("""
         <div class='insight-text'>
-        <p>Contract type is the strongest predictor of churn. Month-to-month contracts show a 42.71% churn rate, 
-        compared to just 11.27% for one-year contracts and only 2.83% for two-year contracts.</p>
+        <p>Contract type is the <span class="text-primary">strongest predictor of churn</span>. Month-to-month contracts show a 
+        <span class="text-warning">42.71% churn rate</span>, compared to just <span class="text-success">11.27% for one-year contracts</span> and only 
+        <span class="text-success">2.83% for two-year contracts</span>.</p>
         </div>
         """, unsafe_allow_html=True)
     
