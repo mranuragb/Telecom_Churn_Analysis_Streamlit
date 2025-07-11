@@ -74,3 +74,8 @@ Feel free to contribute to this project by:
 - Improving the prediction model
 - Enhancing the UI/UX
 - Adding new analysis features
+
+```bash
+git remote add origin https://github.com/yourusername/telecom-churn-analysis.git
+git push -u origin main
+```
