@@ -79,3 +79,10 @@ Feel free to contribute to this project by:
 git remote add origin https://github.com/mranuragb/telecom-churn-analysis.git
 git push -u origin main
 ```
+### IMAGES
+
+<img width="1825" height="840" alt="image" src="https://github.com/user-attachments/assets/da75b3fc-6967-4550-b9be-907f73cf52ed" />
+<img width="1835" height="895" alt="image" src="https://github.com/user-attachments/assets/3417703c-2482-4ef9-9045-5cd90a3af9b8" />
+<img width="1852" height="898" alt="image" src="https://github.com/user-attachments/assets/c10a2f1e-8ce4-40e4-b8e8-2d7ee86db09b" />
+
+
