@@ -21,6 +21,8 @@ pip install -r requirements.txt
 2. **Run the App:**
 ```bash
 streamlit run main.py
+cd E:\Streamlit\teleco
+streamlit run main.py
 ```
 
 ## Data
