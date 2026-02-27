@@ -24,7 +24,8 @@ streamlit run main.py
 cd E:\Streamlit\teleco
 streamlit run main.py
 ```
-
+3. **Streamlit Link :**
+   https://telecochurn.streamlit.app/
 ## Data
 
 The app automatically generates sample data if the original dataset is not found. For real data analysis, place the `churn_dataset.csv` file in the project directory.
